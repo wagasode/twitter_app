@@ -1,32 +1,7 @@
-import json
-import tweepy
 from datetime import datetime
 import csv
-
-def create_client():
-    with open("./secret_twitter_keys.json", encoding="UTF-8") as f:
-        twitter_keys = json.load(f)
-
-    api_key = twitter_keys["API_Key"]
-    api_key_secret = twitter_keys["API_Key_Secret"]
-    access_token = twitter_keys["Access_Token"]
-    access_token_secret = twitter_keys["Access_Token_Secret"]
-    baerer_token = twitter_keys["Baerer_Token"]
-    client = tweepy.Client(baerer_token, consumer_key=api_key, consumer_secret=api_key_secret, access_token=access_token, access_token_secret=access_token_secret, wait_on_rate_limit=True)
-
-    return client 
-
-def search_tweets(client, words, tweet_max):
-    tweet_list = client.search_recent_tweets(query=words, max_results=tweet_max)
-    return tweet_list
-
-def write_csv_user_id(user_id):
-    dt_now = datetime.now()
-    date = f"{dt_now}"
-    with open("./user_id.csv", mode="a", encoding="UTF-8") as f:
-        writer = csv.DictWriter(f, ["Date", "user_id"])
-        writer.writeheader()
-        writer.writerow({"Date": f"{dt_now}", "user_id": f"{user_id}"})
+from get_searched_tweets import *
+import PySimpleGUI as sg
 
 def write_csv_search_tweets(tweets):
     dt_now = datetime.now()
@@ -37,18 +12,42 @@ def write_csv_search_tweets(tweets):
         for index, tweet in enumerate(tweets[0]):
             writer.writerow({"Date": dt_now, "tweet_No": index, "id": tweet["id"], "tweet": tweet["text"]})
 
+def create_msg(tweets):
+    msg = ""
+    for tweet in tweets[0]:
+        msg += f"{tweet}\n"
+    return msg
+
+def execute(client, values, window):
+    value1 = values["input1"]
+    value2 = values["input2"]
+    value3 = values["input3"]
+    tweets = search_tweets(client, [value1, value2], value3)
+    msg = create_msg(tweets)
+    window["text1"].update(msg)
 
 def main():
-    username = "origin_seeker"
-    search_word_list = ["シャドバ", "連勝"]
-    search_tweet_max = 10
+    title = "2つの検索単語を入力すると、それを含むツイートを指定数表示するアプリ"
+    label1, value1 = "検索単語1", "シャドバ"
+    label2, value2 = "検索単語2", "連勝"
+    label3, value3 = "表示ツイート数", "10"
+
+    layout = [[sg.Text(label1, size=(14,1)), sg.Input(value1, key="input1")],
+              [sg.Text(label2, size=(14,1)), sg.Input(value2, key="input2")],
+              [sg.Text(label3, size=(14,1)), sg.Input(value3, key="input3")],
+              [sg.Button("実行", size=(20,1), pad=(5,15), bind_return_key=True)],
+              [sg.Multiline(key="text1", size=(120,40))]]
 
     client = create_client()
-    user = client.get_user(username=username, user_fields="description,protected,location,name,username,public_metrics,profile_image_url,verified") 
-    user_id = user.data.get("id")
-    write_csv_user_id(user_id)
     
-    tweets = search_tweets(client, search_word_list, search_tweet_max)
+    window = sg.Window(title, layout, font=(None, 14))
+    while True:
+        event, values = window.read()
+        if event == None:
+            break
+        if event == "実行":
+            execute(client, values, window)
+    window.close()
     write_csv_search_tweets(tweets)
 
 if __name__ == "__main__":
