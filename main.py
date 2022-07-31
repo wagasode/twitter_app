@@ -31,10 +31,11 @@ def write_csv_user_id(user_id):
 def write_csv_search_tweets(tweets):
     dt_now = datetime.now()
     date = f"{dt_now}"
-    with open("./search_tweets.csv", mode="a", encoding="UTF-8") as f:
-        writer = csv.DictWriter(f, ["Date", "tweets"])
+    with open("./search_tweets.csv", mode="w", encoding="Shift-JIS", newline="\n") as f:
+        writer = csv.DictWriter(f, ["Date", "tweet_No", "id", "tweet"])
         writer.writeheader()
-        writer.writerow({"Date": f"{dt_now}", "tweets": f"{tweets}"})
+        for index, tweet in enumerate(tweets[0]):
+            writer.writerow({"Date": dt_now, "tweet_No": index, "id": tweet["id"], "tweet": tweet["text"]})
 
 
 def main():
