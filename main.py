@@ -16,21 +16,39 @@ def create_client():
 
     return client 
 
+def search_tweets(client, words, tweet_max):
+    tweet_list = client.search_recent_tweets(query=words, max_results=tweet_max)
+    return tweet_list
+
 def write_csv_user_id(user_id):
     today = datetime.today().timetuple()
     date = f"{today.tm_year}-{today.tm_mon}-{today.tm_mday}"
-    with open("./followers.csv", mode="a", encoding="UTF-8") as f:
+    with open("./user_id.csv", mode="a", encoding="UTF-8") as f:
         writer = csv.DictWriter(f, ["Date", "user_id"])
         writer.writeheader()
         writer.writerow({"Date": f"{date}", "user_id": f"{user_id}"})
 
+def write_csv_search_tweets(tweets):
+    today = datetime.today().timetuple()
+    date = f"{today.tm_year}-{today.tm_mon}-{today.tm_mday}"
+    with open("./search_tweets.csv", mode="a", encoding="UTF-8") as f:
+        writer = csv.DictWriter(f, ["Date", "tweets"])
+        writer.writeheader()
+        writer.writerow({"Date": f"{date}", "tweets": f"{tweets}"})
+
+
 def main():
     username = "origin_seeker"
+    search_word_list = ["シャドバ", "連勝"]
+    search_tweet_max = 10
 
     client = create_client()
     user = client.get_user(username=username, user_fields="description,protected,location,name,username,public_metrics,profile_image_url,verified") 
     user_id = user.data.get("id")
     write_csv_user_id(user_id)
+    
+    tweets = search_tweets(client, search_word_list, search_tweet_max)
+    write_csv_search_tweets(tweets)
 
 if __name__ == "__main__":
     main()
