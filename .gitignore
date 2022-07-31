@@ -1,2 +1,2 @@
 # twitter_api用各種キーが記載されたjsonを無視
-./secret_twitter_keys.json
+secret_twitter_keys.json
