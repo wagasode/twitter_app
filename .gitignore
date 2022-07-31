@@ -1,2 +1,9 @@
 # twitter_api用各種キーが記載されたjsonを無視
 secret_twitter_keys.json
+
+# 各種出力用csvを無視
+search_tweets.csv
+user_id.csv
+
+# cron用logを無視
+log/myjob.log

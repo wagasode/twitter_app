@@ -21,20 +21,20 @@ def search_tweets(client, words, tweet_max):
     return tweet_list
 
 def write_csv_user_id(user_id):
-    today = datetime.today().timetuple()
-    date = f"{today.tm_year}-{today.tm_mon}-{today.tm_mday}"
+    dt_now = datetime.now()
+    date = f"{dt_now}"
     with open("./user_id.csv", mode="a", encoding="UTF-8") as f:
         writer = csv.DictWriter(f, ["Date", "user_id"])
         writer.writeheader()
-        writer.writerow({"Date": f"{date}", "user_id": f"{user_id}"})
+        writer.writerow({"Date": f"{dt_now}", "user_id": f"{user_id}"})
 
 def write_csv_search_tweets(tweets):
-    today = datetime.today().timetuple()
-    date = f"{today.tm_year}-{today.tm_mon}-{today.tm_mday}"
+    dt_now = datetime.now()
+    date = f"{dt_now}"
     with open("./search_tweets.csv", mode="a", encoding="UTF-8") as f:
         writer = csv.DictWriter(f, ["Date", "tweets"])
         writer.writeheader()
-        writer.writerow({"Date": f"{date}", "tweets": f"{tweets}"})
+        writer.writerow({"Date": f"{dt_now}", "tweets": f"{tweets}"})
 
 
 def main():
